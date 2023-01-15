@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+						  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sogong.mapper.LessonMapper">
+
+	<select id="read" resultType="map">
+		SELECT
+			lessonSubject subject, lessonDate date, lessonPrice price, lessonContact contact, lessonTeacher teacherID, userName teacherName
+		FROM
+			tbl_lesson JOIN tbl_user ON (lessonTeacher = userID)
+		WHERE
+			lessonID = #{id}
+	</select>
+
+	<insert id="create">
+		INSERT INTO
+			tbl_lesson (lessonSubject, lessonDate, lessonPrice, lessonContact, lessonTeacher)
+		VALUES
+			(#{subject}, NOW(), #{price}, 0, #{teacher})
+	</insert>
+
+
+	<select id="list" resultType="map">
+		SELECT
+			lessonID id, lessonDate date, userName teacher, lessonSubject subject, userCity city, lessonContact contact
+		FROM
+			tbl_lesson JOIN tbl_user ON (lessonTeacher = userID)
+		<include refid="search"></include>
+	</select>
+	
+	
+	<sql id="search">
+		<if test="type != null">
+			<if test="type == 'Date'.toString()">
+				and lessonDate like concat("%", #{keyword}, "%")
+			</if>
+			<if test="type == 'Teacher'.toString()">
+				and userName like concat("%", #{keyword}, "%")
+			</if>
+			<if test="type == 'Subject'.toString()">
+				and lessonSubject like concat("%", #{keyword}, "%")
+			</if>
+			<if test="type == 'City'.toString()">
+				and userCity like concat("%", #{keyword}, "%")
+			</if>
+		</if>
+		<if test="contact == 'on'.toString()">
+			and lessonContact = 0
+		</if>
+	</sql>
+</mapper>

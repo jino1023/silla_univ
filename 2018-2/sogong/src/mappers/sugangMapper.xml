@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+						  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sogong.mapper.SugangMapper">
+
+	
+	<select id="check" resultType="int">
+		SELECT CASE WHEN EXISTS (
+			SELECT
+				*
+			FROM
+				tbl_sugang
+    		WHERE
+    			userID = #{userID} AND lessonID = #{lessonID}
+		)
+		THEN
+			1
+		ELSE
+			0
+		END;
+	</select>
+
+	<insert id="create">
+		INSERT INTO
+			tbl_sugang (userID, lessonID, sugangPayCheck, sugangPayDate)
+		VALUES
+			(#{userID}, #{lessonID}, 0, null)
+	</insert>
+
+
+	<select id="list" resultType="map">
+		<if test="type == 1">
+			SELECT
+				lessonSubject subject, lessonTeacher teacherID, userName teacherName, sugangPayCheck payCheck, sugangPayDate payDate
+			FROM
+				tbl_sugang NATURAL JOIN tbl_lesson NATURAL JOIN tbl_user
+			WHERE
+				userID = #{id}
+		</if>
+		<if test="type == 2">
+			SELECT
+				lessonSubject subject, userID studentID, userName studentName, sugangPayCheck payCheck, sugangPayDate payDate
+			FROM
+				tbl_sugang NATURAL JOIN tbl_lesson NATURAL JOIN tbl_user
+			WHERE
+				lessonTeacher = #{id}
+		</if>
+	</select>
+</mapper>
